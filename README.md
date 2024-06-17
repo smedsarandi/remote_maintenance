@@ -18,3 +18,10 @@ Aplicativo para executar softwares na inicialização do windows
 - excluirá todas as tarefas inuteis e scripts antigos
 - criará a tarefa agendada para ser exacutadas nos logins
 - criará arquivo de log bem detalhado sobre a instalação
+
+
+## config
+> código para criar ambiente virtual
+python -m venv .venv
+> código para entrar no ambiente virtual
+.venv\Scripts\activate
