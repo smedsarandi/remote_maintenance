@@ -25,3 +25,10 @@ Aplicativo para executar softwares na inicialização do windows
 python -m venv .venv
 > código para entrar no ambiente virtual
 .venv\Scripts\activate
+
+>lista todas as branche
+git branch -a
+>ver todas as branches remotas
+git fetch
+>Faz o checkout para a branch específica:
+git checkout nome_do_branch
