@@ -1,6 +1,5 @@
 .venv
 build
-dist
 *.spec
 *.log
 testes
