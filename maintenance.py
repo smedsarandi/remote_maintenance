@@ -5,6 +5,7 @@ hostname = socket.gethostbyname()
 #definindo o local de trabalho do executável
 os.chdir('c:/Windows/Temp/')
 
+#função usada para baixar arquivos
 def downloader_file(url, local_filename):
     response = requests.get(url, stream=True)
     if response.status_code == 200:
@@ -16,6 +17,7 @@ def downloader_file(url, local_filename):
         print(f'Falha ao baixar: {url}')
 
 
+#função usada para baixar novas configuraçõesm do json
 def downloader_json(url):
     response = requests.get(url, stream=True)
     if response.status_code == 200:
@@ -26,6 +28,7 @@ def downloader_json(url):
         return False
 
 
+#função usada para executar os app
 def file_executor(app_name, url, executable_name):
     with zipfile.ZipFile(app_name, 'r') as Zip:#extraindo arquivos
         Zip.extractall()
