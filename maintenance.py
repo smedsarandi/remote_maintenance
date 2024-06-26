@@ -3,7 +3,7 @@ import os, zipfile, time, glob, socket, json, requests, shutil, subprocess
 hostname = socket.gethostname()
 
 #definindo o local de trabalho do executável
-directory_executor = 'c:/Windows/Temp/'
+directory_executor = 'c:/apps/'
 os.chdir(directory_executor)
 
 #Classe que gerenciará os apps baixados
@@ -41,7 +41,8 @@ class App_manager:
 
     #metodo que inicia o app baixado pelo 'app_download'
     def app_start(self):
-        app = subprocess.Popen(self.executable_name, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        print('abrindo o app')
+        os.popen(self.executable_name)
 
     def app_stop():
         pass
@@ -50,7 +51,7 @@ class App_manager:
         pass
 
  
-app1 = App_manager(app_name='calc', version=1, url_download='https://github.com/smedsarandi/remote_maintenance/raw/main/apps/calc/dist/calc.zip', executable_name='calc.exe')
+app1 = App_manager(app_name='teste1', version=1, url_download='https://github.com/smedsarandi/remote_maintenance/raw/main/apps/teste1/dist/teste1.zip', executable_name='teste1.exe')
 app1.app_download()
 app1.app_start()
 
