@@ -65,7 +65,8 @@ while True:
                         for maquina in valor['maquinas']:
                             if maquina == 'all' or maquina == hostname:
                                 ######## FALTA COMPARAR A VERSÃO ANTES DE MANDAR BAIXAR
-                                file_executor(app_name=chave, url=valor['url'], executable_name=valor['executable_name'])
+                                if valor['version'] > remote_maintenance_old[chave]['version']:
+                                    file_executor(app_name=chave, url=valor['url'], executable_name=valor['executable_name'])
                             else:
                                 pass
                                 #print(f'não executar {chave}')
