@@ -1,5 +1,5 @@
 #Este módulo deverá ser chamado sempre que iniciar o usuário. Ele será instalado pelo módulo "install"
-import os, zipfile, time, glob, socket, json, requests, shutil
+import os, zipfile, time, glob, socket, json, requests, shutil, subprocess
 hostname = socket.gethostname()
 
 #definindo o local de trabalho do executável
@@ -20,18 +20,17 @@ class App_manager:
         try:
             response = requests.get(self.url_download, stream=True)
             if response.status_code == 200:
-                print('statuscode 200')
-                #baixando o arquivo .zip
+                print('statuscode 200') 
                 with open(f'{self.app_name}.zip', 'wb') as file:
+                    print('baixando o arquivo .zip')
                     response.raw.decode_content = True
                     shutil.copyfileobj(response.raw, file)
             
-                #extraindo o arquivo .zip
                 with zipfile.ZipFile(f'{self.app_name}.zip', 'r') as Zip:
-                    Zip.extractall()
                     print(f'extraido {self.app_name}.zip')
+                    Zip.extractall()
                     time.sleep(5)
-                #excluindo o .zip baixado
+                print('excluindo o .zip baixado')
                 os.remove(f'{self.app_name}.zip')
                 return True
             else:
@@ -41,8 +40,8 @@ class App_manager:
             return False
 
     #metodo que inicia o app baixado pelo 'app_download'
-    def app_start():
-        pass
+    def app_start(self):
+        app = subprocess.Popen(self.executable_name, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     def app_stop():
         pass
@@ -51,8 +50,9 @@ class App_manager:
         pass
 
  
-app1 = App_manager(app_name='calc', version=1, url_download='https://github.com/smedsarandi/remote_maintenance/raw/main/apps/dist/calc.zip', executable_name='calc.exe')
+app1 = App_manager(app_name='calc', version=1, url_download='https://github.com/smedsarandi/remote_maintenance/raw/main/apps/calc/dist/calc.zip', executable_name='calc.exe')
 app1.app_download()
+app1.app_start()
 
 
 
@@ -95,7 +95,7 @@ def file_executor(app_name, url, executable_name):
 
     
 #loop que será chamado no intervalo de tempo definido no "time_loop"
-while True:
+whil e True:
     os.chdir(directory_executor)
     remote_maintenance_new = downloader_json(url='https://github.com/smedsarandi/remote_maintenance/raw/gui/remote_maintenance.json')
     try:

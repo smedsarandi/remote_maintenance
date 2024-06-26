@@ -1,2 +1,4 @@
-import os
-os.popen('calc')
+import time
+print('funcionou')
+
+time.sleep(50)
