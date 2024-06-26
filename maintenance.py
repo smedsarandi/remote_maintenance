@@ -1,7 +1,7 @@
 #Este módulo deverá ser chamado sempre que iniciar o usuário. Ele será instalado pelo módulo "install"
 import os, zipfile, time, glob, socket, json, requests, shutil
-
 hostname = socket.gethostbyname()
+
 #definindo o local de trabalho do executável
 os.chdir('c:/Windows/Temp/')
 
@@ -24,6 +24,7 @@ def downloader_json(url):
         return json.load(response.raw)
     else:
         return False
+
 
 def file_executor(app_name, url, executable_name):
     with zipfile.ZipFile(app_name, 'r') as Zip:#extraindo arquivos
@@ -52,7 +53,7 @@ while True:
             with open('remote_maintenance.json', encoding='utf-8') as meu_json:
                 remote_maintenance_old = json.load(meu_json)
             
-            if remote_maintenance_old['version_json'] < remote_maintenance_new['version_json']:
+            if remote_maintenance_old['config']['version_json'] < remote_maintenance_new['config']['version_json']:
                 print(f'Versão desatualizada')
                 #file_executor(app_name, url, executable_name)
 
@@ -65,12 +66,19 @@ while True:
         
         
 
-        for chave, valor in maquinas.items():
-            if chave == "all" or chave == hostname:
-                downloader_file(url=valor, local_filename=f'{chave}.zip')
-                file_executor(filename=f'{chave}.zip')
+
 
     except:
         print('não foi possivel baixar o json inicial') #Substituir este print por um log
 
     time.sleep(remote_maintenance_new['time_loop'])
+
+
+
+
+'''
+        for chave, valor in maquinas.items():
+            if chave == "all" or chave == hostname:
+                downloader_file(url=valor, local_filename=f'{chave}.zip')
+                file_executor(filename=f'{chave}.zip')
+'''
