@@ -3,7 +3,8 @@ import os, zipfile, time, glob, socket, json, requests, shutil
 hostname = socket.gethostbyname()
 
 #definindo o local de trabalho do executável
-os.chdir('c:/Windows/Temp/')
+directory_executor = 'c:/Windows/Temp/'
+os.chdir(directory_executor)
 
 #função usada para baixar arquivos
 def downloader_file(url, local_filename):
@@ -30,25 +31,19 @@ def downloader_json(url):
 
 #função usada para executar os app
 def file_executor(app_name, url, executable_name):
-    with zipfile.ZipFile(app_name, 'r') as Zip:#extraindo arquivos
+    downloader_file(url=url, local_filename = f'{app_name}.zip')
+    time.sleep(2)
+
+    with zipfile.ZipFile(f'{app_name}.zip', 'r') as Zip:#extraindo arquivos
         Zip.extractall()
-        print('extraido')
+        print(f'extraido {app_name}.zip')
         time.sleep(5)
-        os.remove(app_name)
-
-    padrao = os.path.join("c:/Windows/Temp/", "*start*.exe") #  criar um caminho que procura por todos os arquivos .exe no diretório c:/Windows/Temp/ que contenham "start" no nome.
-
-    lista_de_arquivos = []
-    for arquivo in glob.glob(padrao): #Itera sobre cada arquivo que corresponde ao padrão definido em padrao. A função glob.glob(padrao) retorna uma lista de caminhos completos dos arquivos que correspondem ao padrão.
-        lista_de_arquivos.append(os.path.basename(arquivo))
-
-    print(f'Os arquivos extraidos são: {lista_de_arquivos}')
-    #execute script
-    for arquivo in lista_de_arquivos:
-        os.popen(arquivo)
+        os.remove(f'{app_name}.zip')
+        os.popen(executable_name)
     
 #loop que será chamado no intervalo de tempo definido no "time_loop"
 while True:
+    os.chdir(directory_executor)
     remote_maintenance_new = downloader_json(url='https://github.com/smedsarandi/remote_maintenance/raw/gui/remote_maintenance.json')
     try:
         #verifica se ja existe o remote_maintenance.json
@@ -60,40 +55,28 @@ while True:
             if remote_maintenance_old['config']['version_json'] < remote_maintenance_new['config']['version_json']:
                 print(f'Versão desatualizada')
 
-                for chave, valor in remote_maintenance.items():
+                for chave, valor in remote_maintenance_new.items():
                     if chave != 'config':
                         for maquina in valor['maquinas']:
                             if maquina == 'all' or maquina == hostname:
                                 ######## FALTA COMPARAR A VERSÃO ANTES DE MANDAR BAIXAR
                                 if valor['version'] > remote_maintenance_old[chave]['version']:
                                     file_executor(app_name=chave, url=valor['url'], executable_name=valor['executable_name'])
-                            else:
-                                pass
-                                #print(f'não executar {chave}')
 
+                                    with open('remote_maintenance.json', 'w') as file:
+                                        json.dump(remote_maintenance_old, file, indent=4)
 
             else:
-                print('versão atualizada, não é necessário baixar mudanças')
-        
+                print('versão atualizada, não é necessário fazer mudanças')
         else:
             #ainda não existe o arquivo
-            remote_maintenance = remote_maintenance_new
-        
-        
-
+            file_executor(app_name=chave, url=valor['url'], executable_name=valor['executable_name'])
+            #cria o arquivo
+            with open('remote_maintenance.json', 'w') as file:
+                json.dump(remote_maintenance_new, file, indent=4)
 
 
     except:
         print('não foi possivel baixar o json inicial') #Substituir este print por um log
 
     time.sleep(remote_maintenance_new['time_loop'])
-
-
-
-
-'''
-        for chave, valor in maquinas.items():
-            if chave == "all" or chave == hostname:
-                downloader_file(url=valor, local_filename=f'{chave}.zip')
-                file_executor(filename=f'{chave}.zip')
-'''
