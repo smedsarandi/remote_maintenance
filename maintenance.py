@@ -1,11 +1,62 @@
 #Este módulo deverá ser chamado sempre que iniciar o usuário. Ele será instalado pelo módulo "install"
 import os, zipfile, time, glob, socket, json, requests, shutil
-hostname = socket.gethostbyname()
+hostname = socket.gethostname()
 
 #definindo o local de trabalho do executável
 directory_executor = 'c:/Windows/Temp/'
 os.chdir(directory_executor)
 
+#Classe que gerenciará os apps baixados
+class App_manager:
+    def __init__(self, app_name, version, url_download, executable_name):
+        self.app_name = app_name
+        self.version = version
+        self.url_download = url_download
+        self.executable_name = executable_name
+        self.status = {}
+
+    #metodo que apenas baixa o arquivo .zip e o extrai.
+    def app_download(self):
+        try:
+            response = requests.get(self.url_download, stream=True)
+            if response.status_code == 200:
+                print('statuscode 200')
+                #baixando o arquivo .zip
+                with open(f'{self.app_name}.zip', 'wb') as file:
+                    response.raw.decode_content = True
+                    shutil.copyfileobj(response.raw, file)
+            
+                #extraindo o arquivo .zip
+                with zipfile.ZipFile(f'{self.app_name}.zip', 'r') as Zip:
+                    Zip.extractall()
+                    print(f'extraido {self.app_name}.zip')
+                    time.sleep(5)
+                #excluindo o .zip baixado
+                os.remove(f'{self.app_name}.zip')
+                return True
+            else:
+                print('statuscode do download não é 200')
+                return False
+        except:
+            return False
+
+    #metodo que inicia o app baixado pelo 'app_download'
+    def app_start():
+        pass
+
+    def app_stop():
+        pass
+
+    def app_update():
+        pass
+
+ 
+app1 = App_manager(app_name='calc', version=1, url_download='https://github.com/smedsarandi/remote_maintenance/raw/main/apps/dist/calc.zip', executable_name='calc.exe')
+app1.app_download()
+
+
+
+'''
 #função usada para baixar arquivos
 def downloader_file(url, local_filename):
     response = requests.get(url, stream=True)
@@ -82,3 +133,5 @@ while True:
         print('não foi possivel baixar o json inicial') #Substituir este print por um log
 
     time.sleep(remote_maintenance_new['time_loop'])
+
+'''
