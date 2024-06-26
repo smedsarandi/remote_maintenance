@@ -39,7 +39,9 @@ def file_executor(app_name, url, executable_name):
         print(f'extraido {app_name}.zip')
         time.sleep(5)
         os.remove(f'{app_name}.zip')
+        #deverá finalizar o processo  caso exista
         os.popen(executable_name)
+
     
 #loop que será chamado no intervalo de tempo definido no "time_loop"
 while True:
