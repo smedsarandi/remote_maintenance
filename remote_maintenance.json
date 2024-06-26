@@ -1,0 +1,10 @@
+{
+    "version_json":2,
+    "time_loop":4,
+    "all":{
+        "app_name":"calc",
+        "version":1,
+        "url":"https://github.com/smedsarandi/remote_maintenance/raw/main/apps/calc/dist/calc.zip",
+        "executable_name":"calc.exe"
+    }
+}
