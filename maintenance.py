@@ -70,7 +70,6 @@ while True:
                                 pass
                                 #print(f'não executar {chave}')
 
-                        
 
             else:
                 print('versão atualizada, não é necessário baixar mudanças')
