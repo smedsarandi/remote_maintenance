@@ -59,7 +59,18 @@ while True:
             
             if remote_maintenance_old['config']['version_json'] < remote_maintenance_new['config']['version_json']:
                 print(f'Versão desatualizada')
-                #file_executor(app_name, url, executable_name)
+
+                for chave, valor in remote_maintenance.items():
+                    if chave != 'config':
+                        for maquina in valor['maquinas']:
+                            if maquina == 'all' or maquina == hostname:
+                                ######## FALTA COMPARAR A VERSÃO ANTES DE MANDAR BAIXAR
+                                file_executor(app_name=chave, url=valor['url'], executable_name=valor['executable_name'])
+                            else:
+                                pass
+                                #print(f'não executar {chave}')
+
+                        
 
             else:
                 print('versão atualizada, não é necessário baixar mudanças')

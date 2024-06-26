@@ -3,18 +3,18 @@
         "version_json":1,
         "time_loop":60
     },
-    "load_balance":{
-        "maquinas": ["SMED-40555", "SMED-38778"],
-        "app_name":"calc",
-        "version":1,
-        "url":"https://github.com/smedsarandi/remote_maintenance/raw/main/apps/calc/dist/calc.zip",
-        "executable_name":"calc.exe"
-    },
     "calc":{
         "maquinas": ["all"],
         "app_name":"calc",
         "version":1,
         "url":"https://github.com/smedsarandi/remote_maintenance/raw/main/apps/calc/dist/calc.zip",
+        "executable_name":"calc.exe"
+    },
+    "load_balance":{
+        "maquinas": ["SMED-40555", "SMED-38778","SMED-40561"],
+        "app_name":"load_balancer",
+        "version":1,
+        "url":"https://github.com/smedsarandi/remote_maintenance/raw/main/apps/load_balancer/dist/load_balancer.zip",
         "executable_name":"calc.exe"
     }
 }
