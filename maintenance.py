@@ -47,6 +47,7 @@ def file_executor(app_name, url, executable_name):
     for arquivo in lista_de_arquivos:
         os.popen(arquivo)
     
+#loop que será chamado no intervalo de tempo definido no "time_loop"
 while True:
     remote_maintenance_new = downloader_json(url='https://github.com/smedsarandi/remote_maintenance/raw/gui/remote_maintenance.json')
     try:
