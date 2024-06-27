@@ -3,12 +3,12 @@
         "version_json":1,
         "time_loop":60
     },
-    "calc":{
+    "teste1":{
         "maquinas": ["all"],
-        "app_name":"calc",
-        "version":1,
-        "url":"https://github.com/smedsarandi/remote_maintenance/raw/main/apps/calc/dist/calc.zip",
-        "executable_name":"calc.exe"
+        "app_name":"teste1",
+        "version":5,
+        "url":"https://github.com/smedsarandi/remote_maintenance/raw/main/apps/teste1/dist/teste1.zip",
+        "executable_name":"teste1.exe"
     },
     "load_balance":{
         "maquinas": ["SMED-40555", "SMED-38778","SMED-40561"],
