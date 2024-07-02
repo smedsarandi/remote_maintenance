@@ -97,11 +97,12 @@ import json
 def initialize():
     response = requests.get('https://github.com/smedsarandi/remote_maintenance/raw/main/remote_maintenance.json')
     if response.status_code == 200:
-        print('Será feita a inicialização')
+       
         objeto_criado = response.json()  # Decodifica o conteúdo JSON da resposta
         
-        app_managers = []
+
         if len(app_managers) == 0:
+            print("existem 0 apps")
             for key, value in objeto_criado.items():
                 if 'maquinas' in value:
                     if hostname in value['maquinas'] or 'all' in value['maquinas']:
@@ -109,17 +110,20 @@ def initialize():
                         app_manager = App_manager(app_name=key, version=value['version'], url_download=value["url"], executable_name=value["executable_name"])
                         app_managers.append(app_manager)
         else:
-            pass
+            print(f"exitem {len(app_managers)} apps")
+            for instance in app_managers:
+                print(instance.app_name)
         return app_managers
     else:
         print(f'Falha ao fazer o download. Status code: {response.status_code}')
 
 
-initialize()
 
 
-app_managers = initialize()
 
+while True:
+    app_managers = initialize()
+    time.sleep(5)
 
-print(app_managers[1].app_name)
+#print(app_managers[0].app_name)
 
