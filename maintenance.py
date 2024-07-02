@@ -1,7 +1,7 @@
 import os, zipfile, time, socket, json, requests, shutil, psutil, subprocess, threading
 
 hostname = socket.gethostname()
-
+app_managers = []
 # Verificação de existência do diretório
 directory_executor = 'c:/apps/'
 if not os.path.exists(directory_executor):
@@ -100,34 +100,26 @@ def initialize():
         print('Será feita a inicialização')
         objeto_criado = response.json()  # Decodifica o conteúdo JSON da resposta
         
-        for key, value in objeto_criado.items():
-            if 'maquinas' in value:
-                if hostname in value['maquinas'] or 'all' in value['maquinas']:
-                    print(f'Será inicializado o app"{key}".')
-
+        app_managers = []
+        if len(app_managers) == 0:
+            for key, value in objeto_criado.items():
+                if 'maquinas' in value:
+                    if hostname in value['maquinas'] or 'all' in value['maquinas']:
+                        print(f'Será inicializado o app"{key}"')
+                        app_manager = App_manager(app_name=key, version=value['version'], url_download=value["url"], executable_name=value["executable_name"])
+                        app_managers.append(app_manager)
+        else:
+            pass
+        return app_managers
     else:
         print(f'Falha ao fazer o download. Status code: {response.status_code}')
 
 
 initialize()
 
-  
 
-'''
-        
-   
-    with open(f'{self.app_name}.zip', 'wb') as file:
-        print(f'{self.app_name}: baixando o arquivo .zip')
-        
-        shutil.copyfileobj(response.raw, file)
-                
-                    with zipfile.ZipFile(f'{self.app_name}.zip', 'r') as Zip:
-                        print(f'{self.app_name}: extraido {self.app_name}.zip')
-                        Zip.extractall()
-                        time.sleep(5)
-                    print(f'{self.app_name}: excluindo o .zip baixado')
-                    os.remove(f'{self.app_name}.zip')
-                    return True
+app_managers = initialize()
 
 
-                    '''
+print(app_managers[1].app_name)
+
