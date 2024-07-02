@@ -112,6 +112,11 @@ def initialize():
         else:
             print(f"exitem {len(app_managers)} apps")
             for instance in app_managers:
+                if instance.version < objeto_criado[instance.app_name]['version']:
+                    print(f'app {instance.app_name} será atualizado')
+                    pass
+                else:
+                    print(f'app {instance.app_name} Não será atualizado')
                 print(instance.app_name)
         return app_managers
     else:
