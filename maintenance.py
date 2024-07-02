@@ -121,12 +121,11 @@ def initialize():
         print(f'Falha ao fazer o download. Status code: {response.status_code}')
 
 
+def initialize_loop():
+    while True:
+        app_managers = initialize()
+        time.sleep(5)
 
-
-
-while True:
-    app_managers = initialize()
-    time.sleep(5)
-
-#print(app_managers[0].app_name)
+initialize_thread = threading.Thread(target=initialize_loop)
+initialize_thread.start()
 
