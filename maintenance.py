@@ -19,7 +19,7 @@ class App_manager:
 
     # Método que APENAS BAIXA E EXTRAI o arquivo .zip no 'directory_executor'
     def app_download(self):
-        print(f'\n\nSOLICITADO DOWNLOAD PARA {self.app_name}')
+        print(f'\n\n{self.app_name}: SOLICITOUO DOWNLOAD')
         try:
             response = requests.get(self.url_download, stream=True)
             if response.status_code == 200:
@@ -51,7 +51,7 @@ class App_manager:
 
     # Método que INICIA O APP
     def app_start(self):
-        print(f'\n\nSOLICITADO START PARA {self.app_name}')
+        print(f'\n\n{self.app_name}: SOLICITOU START')
         try:
             executable_path = os.path.join(directory_executor, self.executable_name)
             if os.path.exists(executable_path):
@@ -64,7 +64,7 @@ class App_manager:
 
     # Método que PARA O APP
     def app_stop(self):
-        print(f'\n\nSOLICITADO STOP PARA {self.app_name}')
+        print(f'\n\n{self.app_name}: SOLICITOU STOP')
         for proc in psutil.process_iter(['pid', 'name']):
             try:
                 if self.executable_name.lower() in proc.info['name'].lower():
@@ -78,7 +78,7 @@ class App_manager:
 
     # Método que ATUALIZA O APP
     def app_update(self, remote_version):
-        print(f'\n\nSOLICITADO UPDATE PARA {self.app_name}')
+        print(f'\n\n{self.app_name}: SOLICITOU UPDATE')
         if self.version < remote_version:
             print(f'{self.app_name}: Versão Local: {self.version}, Versão Server: {remote_version}')
             print(f'{self.app_name}: Inicializando atualização')
@@ -95,26 +95,24 @@ def initialize():
        
         objeto_criado = response.json()  # Decodifica o conteúdo JSON da resposta
         
-        
-
         if len(app_managers) == 0:
-            print("existem 0 apps")
+            print("\n0 apps em execução")
             for key, value in objeto_criado.items():
                 if 'maquinas' in value:
                     if hostname in value['maquinas'] or 'all' in value['maquinas']:
-                        print(f'Será inicializado o app"{key}"')
+                        print(f'{key}: Inicializando')
                         app_manager = App_manager(app_name=key, version=value['version'], url_download=value["url"], executable_name=value["executable_name"])
                         app_managers.append(app_manager)
         else:
-            print(f"exitem {len(app_managers)} apps")
+            print(f"\n{len(app_managers)} apps em execução")
             for instance in app_managers:
                 versao_remote = objeto_criado[instance.app_name]['version']
                 if instance.version < versao_remote:
-                    print(f'app {instance.app_name} será atualizado')
+                    print(f'{instance.app_name} será atualizado')
                     instance.app_update(remote_version=versao_remote)
                     
                 else:
-                    print(f'app {instance.app_name} Não será atualizado')
+                    print(f'{instance.app_name} Não será atualizado')
                 #print(instance.app_name)
         return app_managers
     else:
