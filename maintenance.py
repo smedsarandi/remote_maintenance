@@ -1,126 +1,160 @@
-import os, zipfile, time, socket, json, requests, shutil, psutil, subprocess, threading
+# Importações de bibliotecas padrão
+import os
+import zipfile
+import time
+import socket
+import json
+import shutil
+import subprocess
+import threading
+import logging
 
+# Importações de bibliotecas de terceiros
+import requests
+import psutil
+
+# Variaveis globais
 hostname = socket.gethostname()
-app_managers = []
-# Verificação de existência do diretório
+app_managers = [] #É uma lista que contêm todos os apps em execução no momento
 directory_executor = 'c:/apps/'
+
+# Verificação a existência do diretório de execução, caso contrário ele será criado
 if not os.path.exists(directory_executor):
     os.makedirs(directory_executor)
+# definindo o diretório de execução
 os.chdir(directory_executor)
 
-# Classe que gerenciará os apps já baixados e possivelmente em execução que foram filtrados pela Função get_new_app()
+# Configurando o logger
+logging.basicConfig(level=logging.DEBUG, 
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                    handlers=[
+                        logging.FileHandler("remote_maintenance.log"),
+                        logging.StreamHandler()
+                    ])
+
+logger = logging.getLogger()
+
+''' 
+Classe que gerenciará os apps já baixados e possivelmente em execução que foram filtrados pela função "initialize()"
+Cada APP será uma instancia dessa classe e a partir dela será possivel baixar, iniciar, parar e atualizar o APP individualmente
+'''
 class App_manager:
+    #as propriedades que serão instanciadas para cada APP
     def __init__(self, app_name, version, url_download, executable_name):
         self.app_name = app_name
         self.version = version
         self.url_download = url_download
         self.executable_name = executable_name
-        self.status = {}
 
-    # Método que APENAS BAIXA E EXTRAI o arquivo .zip no 'directory_executor'
+    # Método que apenas baixa e extrai o arquivo .zip da url no 'directory_executor' definido nas variaveis globais
     def app_download(self):
-        print(f'\n\n{self.app_name}: SOLICITOUO DOWNLOAD')
+        logger.info(f'{self.app_name}: em download')
         try:
             response = requests.get(self.url_download, stream=True)
             if response.status_code == 200:
-                print(f'{self.app_name}: statuscode 200') 
+                logger.info(f'{self.app_name}: statuscode 200')
                 with open(f'{self.app_name}.zip', 'wb') as file:
-                    print(f'{self.app_name}: baixando o arquivo .zip')
+                    logger.info(f'{self.app_name}: baixando o arquivo .zip')
                     response.raw.decode_content = True
                     shutil.copyfileobj(response.raw, file)
             
                 with zipfile.ZipFile(f'{self.app_name}.zip', 'r') as Zip:
-                    print(f'{self.app_name}: extraido {self.app_name}.zip')
+                    logger.info(f'{self.app_name}: extraido {self.app_name}.zip')
                     Zip.extractall()
                     time.sleep(5)
-                print(f'{self.app_name}: excluindo o .zip baixado')
+                logger.info(f'{self.app_name}: excluindo o .zip baixado')
                 os.remove(f'{self.app_name}.zip')
                 return True
             else:
-                print(f'{self.app_name}: statuscode do download não é 200')
+                logger.warning(f'{self.app_name}: statuscode do download não é 200')
                 return False
         except requests.exceptions.RequestException as e:
-            print(f'{self.app_name}: Erro ao baixar o arquivo: {e}')
+            logger.error(f'{self.app_name}: Erro ao baixar o arquivo: {e}')
             return False
         except zipfile.BadZipFile as e:
-            print(f'{self.app_name}: Erro ao extrair o arquivo zip: {e}')
+            logger.error(f'{self.app_name}: Erro ao extrair o arquivo zip: {e}')
             return False
         except Exception as e:
-            print(f'{self.app_name}: Erro inesperado: {e}')
+            logger.error(f'{self.app_name}: Erro inesperado: {e}')
             return False
 
     # Método que INICIA O APP
     def app_start(self):
-        print(f'\n\n{self.app_name}: SOLICITOU START')
+        logger.info(f'\n\n{self.app_name}: em start')
         try:
             executable_path = os.path.join(directory_executor, self.executable_name)
             if os.path.exists(executable_path):
-                print(f'{self.app_name}: Iniciando o app {self.executable_name}')
+                logger.info(f'{self.app_name}: Iniciando o app {self.executable_name}')
                 subprocess.Popen([executable_path], shell=True)
             else:
-                print(f'{self.app_name}: O executável {self.executable_name} não foi encontrado no diretório {directory_executor}')
+                logger.error(f'{self.app_name}: O executável {self.executable_name} não foi encontrado no diretório {directory_executor}')
         except Exception as e:
-            print(f'{self.app_name}: Erro ao iniciar o app: {e}')
+            logger.error(f'{self.app_name}: Erro ao iniciar o app: {e}')
 
     # Método que PARA O APP
     def app_stop(self):
-        print(f'\n\n{self.app_name}: SOLICITOU STOP')
+        logger.info(f'\n\n{self.app_name}: em stop')
         for proc in psutil.process_iter(['pid', 'name']):
             try:
                 if self.executable_name.lower() in proc.info['name'].lower():
-                    print(f"{self.app_name}: Finalizando processo: {proc.info['name']} (PID: {proc.info['pid']})")
+                    logger.info(f"{self.app_name}: Finalizando processo: {proc.info['name']} (PID: {proc.info['pid']})")
                     proc.terminate()  # Envia o sinal de término
                     proc.wait(timeout=5)  # Espera que o processo termine
-                    print(f"{self.app_name}: Processo {proc.info['name']} (PID: {proc.info['pid']}) finalizado com sucesso")
+                    logger.info(f"{self.app_name}: Processo {proc.info['name']} (PID: {proc.info['pid']}) finalizado com sucesso")
                     return True
             except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess) as e:
-                print(f'{self.app_name}: Erro ao finalizar o processo: {e}')
+                logger.error(f'{self.app_name}: Erro ao finalizar o processo: {e}')
 
     # Método que ATUALIZA O APP
     def app_update(self, remote_version):
-        print(f'\n\n{self.app_name}: SOLICITOU UPDATE')
+        logger.info(f'\n\n{self.app_name}: em update')
         if self.version < remote_version:
-            print(f'{self.app_name}: Versão Local: {self.version}, Versão Server: {remote_version}')
-            print(f'{self.app_name}: Inicializando atualização')
+            logger.info(f'{self.app_name}: Versão Local: {self.version}, Versão Server: {remote_version}.\nSerá feito update!!')
             self.app_stop()
             self.app_download()
             self.app_start()
             self.version = remote_version
+            logger.info(f'{self.app_name}: agora está na versão: {self.version}.')
         else:
-            print(f'{self.app_name}: Não é necessário atualizar. Versão Local: {self.version}, Versão Server: {remote_version}')
+            logger.info(f'{self.app_name}: Desnecessário atualizar. Versão Local: {self.version}, Versão Server: {remote_version}')
 
+'''
+Está função será colocada em outra função de loop;
+Ela é responsavel por verificar no json remoto se será preciso iniciar algum app;
+Se APPS ja estão inicializados ela vetificará a versão atual para possiveis update.
+'''
 def initialize():
     response = requests.get('https://github.com/smedsarandi/remote_maintenance/raw/main/remote_maintenance.json')
-    if response.status_code == 200:
-       
-        objeto_criado = response.json()  # Decodifica o conteúdo JSON da resposta
-        
+    if response.status_code == 200: 
+        json_remote = response.json()  # Decodifica o conteúdo JSON da resposta
+        #esse "app_managers" é uma lista que contêm todos os apps em execução no momento
         if len(app_managers) == 0:
-            print("\n0 apps em execução")
-            for key, value in objeto_criado.items():
+            logger.warning("\n\n0 apps em execução")
+            for key, value in json_remote.items():
                 if 'maquinas' in value:
                     if hostname in value['maquinas'] or 'all' in value['maquinas']:
-                        print(f'{key}: Inicializando')
+                        logger.info(f'{key}: instanciando')
                         app_manager = App_manager(app_name=key, version=value['version'], url_download=value["url"], executable_name=value["executable_name"])
+                        app_manager.app_download()
+                        app_manager.app_start()
                         app_managers.append(app_manager)
         else:
-            print(f"\n{len(app_managers)} apps em execução")
+            logger.warning(f"\n\n{len(app_managers)} apps em execução")
             for instance in app_managers:
-                versao_remote = objeto_criado[instance.app_name]['version']
+                versao_remote = json_remote[instance.app_name]['version']
                 if instance.version < versao_remote:
-                    print(f'{instance.app_name} será atualizado')
-                    instance.app_update(remote_version=versao_remote)
-                    
+                    logger.warning(f'{instance.app_name} será atualizado')
+                    instance.app_update(remote_version=versao_remote)    
                 else:
-                    print(f'{instance.app_name} Não será atualizado')
-                #print(instance.app_name)
+                    logger.info(f'{instance.app_name} Não será atualizado')
         return app_managers
     else:
-        print(f'Falha ao fazer o download. Status code: {response.status_code}')
+        logger.critical(f'LOOP ERROR Falha ao fazer o download. Status code: {response.status_code}')
 
 
 def initialize_loop():
     while True:
+        logger.warning("\n\n\n INICIALIZANDO LOOP")
         app_managers = initialize()
         time.sleep(5)
 
