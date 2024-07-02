@@ -90,58 +90,44 @@ class App_manager:
         else:
             print(f'{self.app_name}: Não é necessário atualizar. Versão Local: {self.version}, Versão Server: {remote_version}')
 
-# Função para gerenciar cada app em uma thread separada
-def manage_app(app_manager, remote_version, remote_url):
-    if not app_manager.app_download():
-        return
-    app_manager.app_start()
-    while True:
-        app_manager.app_update(remote_version, remote_url)
-        time.sleep(time_loop)
 
-# Função que verifica se este PC precisa executar algum APP
-def get_new_app():
-    global time_loop
-    try:
-        response = requests.get('https://github.com/smedsarandi/remote_maintenance/raw/main/remote_maintenance.json')
-        if response.status_code == 200:
-            data = response.json()
-            config = data.get('config', {})
-            time_loop = config.get('time_loop', 60)  # Tempo padrão de 60 segundos se não especificado
+import requests
+import json
 
-            app_managers = {}
+def initialize():
+    response = requests.get('https://github.com/smedsarandi/remote_maintenance/raw/main/remote_maintenance.json')
+    if response.status_code == 200:
+        print('Será feita a inicialização')
+        objeto_criado = response.json()  # Decodifica o conteúdo JSON da resposta
+        
+        for key, value in objeto_criado.items():
+            if 'maquinas' in value:
+                if hostname in value['maquinas'] or 'all' in value['maquinas']:
+                    print(f'Será inicializado o app"{key}".')
 
-            while True:
-                for app_name, app_info in data.items():
-                    if app_name == 'config':
-                        continue
-                    maquinas = app_info.get('maquinas', [])
-                    if 'all' in maquinas or hostname in maquinas:
-                        if app_name not in app_managers:
-                            app_manager = App_manager(
-                                app_name=app_info['app_name'],
-                                version=0,  # Inicializa a versão como 0 para garantir que baixe a primeira vez
-                                url_download=app_info['url'],
-                                executable_name=app_info['executable_name']
-                            )
-                            app_managers[app_name] = app_manager
-                            threading.Thread(target=manage_app, args=(app_manager, app_info['version'], app_info['url'])).start()
-                time.sleep(time_loop)  # Espera pelo tempo definido antes de verificar novamente
-        else:
-            print('Falha ao baixar remote_maintenance.json')
-            time.sleep(60)  # Espera 60 segundos antes de tentar novamente em caso de falha
-    except requests.exceptions.RequestException as e:
-        print(f'Erro ao baixar o arquivo JSON: {e}')
-        time.sleep(60)  # Espera 60 segundos antes de tentar novamente em caso de erro de rede
-    except json.JSONDecodeError as e:
-        print(f'Erro ao decodificar o arquivo JSON: {e}')
-        time.sleep(60)  # Espera 60 segundos antes de tentar novamente em caso de erro de decodificação
-    except KeyError as e:
-        print(f'Erro na estrutura do arquivo JSON: {e}')
-        time.sleep(60)  # Espera 60 segundos antes de tentar novamente em caso de erro de estrutura
-    except Exception as e:
-        print(f'Erro inesperado: {e}')
-        time.sleep(60)  # Espera 60 segundos antes de tentar novamente em caso de erro inesperado
+    else:
+        print(f'Falha ao fazer o download. Status code: {response.status_code}')
 
-# Exemplo de uso
-get_new_app()
+
+initialize()
+
+  
+
+'''
+        
+   
+    with open(f'{self.app_name}.zip', 'wb') as file:
+        print(f'{self.app_name}: baixando o arquivo .zip')
+        
+        shutil.copyfileobj(response.raw, file)
+                
+                    with zipfile.ZipFile(f'{self.app_name}.zip', 'r') as Zip:
+                        print(f'{self.app_name}: extraido {self.app_name}.zip')
+                        Zip.extractall()
+                        time.sleep(5)
+                    print(f'{self.app_name}: excluindo o .zip baixado')
+                    os.remove(f'{self.app_name}.zip')
+                    return True
+
+
+                    '''

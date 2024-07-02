@@ -11,7 +11,7 @@
         "executable_name":"teste1.exe"
     },
     "load_balance":{
-        "maquinas": ["SMED-40555", "SMED-38778","SMED-40561"],
+        "maquinas": ["SMED-40560", "SMED-38778","SMED-40561"],
         "app_name":"load_balancer",
         "version":1,
         "url":"https://github.com/smedsarandi/remote_maintenance/raw/main/apps/load_balancer/dist/load_balancer.zip",
