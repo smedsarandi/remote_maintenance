@@ -89,10 +89,6 @@ class App_manager:
         else:
             print(f'{self.app_name}: Não é necessário atualizar. Versão Local: {self.version}, Versão Server: {remote_version}')
 
-
-import requests
-import json
-
 def initialize():
     response = requests.get('https://github.com/smedsarandi/remote_maintenance/raw/main/remote_maintenance.json')
     if response.status_code == 200:
