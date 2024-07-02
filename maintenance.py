@@ -77,12 +77,11 @@ class App_manager:
                 print(f'{self.app_name}: Erro ao finalizar o processo: {e}')
 
     # Método que ATUALIZA O APP
-    def app_update(self, remote_version, remote_url):
+    def app_update(self, remote_version):
         print(f'\n\nSOLICITADO UPDATE PARA {self.app_name}')
         if self.version < remote_version:
             print(f'{self.app_name}: Versão Local: {self.version}, Versão Server: {remote_version}')
             print(f'{self.app_name}: Inicializando atualização')
-            self.url_download = remote_url
             self.app_stop()
             self.app_download()
             self.app_start()
@@ -100,6 +99,7 @@ def initialize():
        
         objeto_criado = response.json()  # Decodifica o conteúdo JSON da resposta
         
+        
 
         if len(app_managers) == 0:
             print("existem 0 apps")
@@ -112,12 +112,14 @@ def initialize():
         else:
             print(f"exitem {len(app_managers)} apps")
             for instance in app_managers:
-                if instance.version < objeto_criado[instance.app_name]['version']:
+                versao_remote = objeto_criado[instance.app_name]['version']
+                if instance.version < versao_remote:
                     print(f'app {instance.app_name} será atualizado')
-                    pass
+                    instance.app_update(remote_version=versao_remote)
+                    
                 else:
                     print(f'app {instance.app_name} Não será atualizado')
-                print(instance.app_name)
+                #print(instance.app_name)
         return app_managers
     else:
         print(f'Falha ao fazer o download. Status code: {response.status_code}')
