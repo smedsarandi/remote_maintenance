@@ -159,6 +159,7 @@ def initialize_loop():
         time.sleep(5)
         
 
+
 initialize_loop()
 #initialize_thread = threading.Thread(target=initialize_loop)
 #initialize_thread.start()
