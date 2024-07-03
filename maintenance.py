@@ -25,8 +25,8 @@ if not os.path.exists(directory_executor):
 os.chdir(directory_executor)
 
 # Configurando o logger
-logging.basicConfig(level=logging.DEBUG, 
-                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+logging.basicConfig(level=logging.INFO, 
+                    format='%(asctime)s - %(levelname)s - %(message)s',
                     handlers=[
                         logging.FileHandler("remote_maintenance.log"),
                         logging.StreamHandler()
@@ -80,7 +80,7 @@ class App_manager:
 
     # Método que INICIA O APP
     def app_start(self):
-        logger.info(f'\n\n{self.app_name}: em start')
+        logger.info(f'{self.app_name}: em start')
         try:
             executable_path = os.path.join(directory_executor, self.executable_name)
             if os.path.exists(executable_path):
@@ -93,7 +93,7 @@ class App_manager:
 
     # Método que PARA O APP
     def app_stop(self):
-        logger.info(f'\n\n{self.app_name}: em stop')
+        logger.info(f'{self.app_name}: em stop')
         for proc in psutil.process_iter(['pid', 'name']):
             try:
                 if self.executable_name.lower() in proc.info['name'].lower():
@@ -107,7 +107,7 @@ class App_manager:
 
     # Método que ATUALIZA O APP
     def app_update(self, remote_version):
-        logger.info(f'\n\n{self.app_name}: em update')
+        logger.info(f'{self.app_name}: em update')
         if self.version < remote_version:
             logger.info(f'{self.app_name}: Versão Local: {self.version}, Versão Server: {remote_version}.\nSerá feito update!!')
             self.app_stop()
@@ -129,7 +129,7 @@ def initialize():
         json_remote = response.json()  # Decodifica o conteúdo JSON da resposta
         #esse "app_managers" é uma lista que contêm todos os apps em execução no momento
         if len(app_managers) == 0:
-            logger.warning("\n\n0 apps em execução")
+            logger.warning("0 apps em execução")
             for key, value in json_remote.items():
                 if 'maquinas' in value:
                     if hostname in value['maquinas'] or 'all' in value['maquinas']:
@@ -139,7 +139,7 @@ def initialize():
                         app_manager.app_start()
                         app_managers.append(app_manager)
         else:
-            logger.warning(f"\n\n{len(app_managers)} apps em execução")
+            logger.warning(f"{len(app_managers)} apps em execução")
             for instance in app_managers:
                 versao_remote = json_remote[instance.app_name]['version']
                 if instance.version < versao_remote:
@@ -154,7 +154,7 @@ def initialize():
 
 def initialize_loop():
     while True:
-        logger.warning("\n\n\n INICIALIZANDO LOOP")
+        logger.warning("INICIALIZANDO LOOP")
         app_managers = initialize()
         time.sleep(5)
 
