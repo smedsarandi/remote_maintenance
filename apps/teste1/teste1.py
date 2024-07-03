@@ -1,4 +1,4 @@
 import time
-print('funcionou')
+print('calc')
 
 time.sleep(50)
