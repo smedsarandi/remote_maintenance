@@ -17,7 +17,6 @@ import psutil
 hostname = socket.gethostname()
 app_managers = [] #É uma lista que contêm todos os apps em execução no momento
 app_quot = 0 #Vai armazenar a quantidade de app que existe quando o app_managers for criado, pois se for criados novos apps para essa maquina, ele reconhecerá
-app_quot_remote = 0
 directory_executor = 'c:/apps/'
 
 # Verificação a existência do diretório de execução, caso contrário ele será criado
@@ -127,7 +126,7 @@ Se APPS ja estão inicializados ela vetificará a versão atual para possiveis u
 def initialize():
     print(f'ao chamar initialize o app_managers é: {len(app_managers)}')
     global app_quot
-    global app_quot_remote
+    app_quot_remote = 0
     response = requests.get('https://github.com/smedsarandi/remote_maintenance/raw/main/remote_maintenance.json')
     if response.status_code == 200: 
         json_remote = response.json()  # Decodifica o conteúdo JSON da resposta
@@ -142,15 +141,26 @@ def initialize():
                         app_manager.app_start()
                         app_managers.append(app_manager)
                         app_quot += 1
-                        #return app_managers
                             
                     elif len(app_managers) > 0:
+                        #aqui ele vai intera por cada APP instanciado, e dar o update em cada um deles
                         for app in app_managers:
-                                print(type(app.app_name))
-                                print(type(key))
+                                logger.info(f'{app.app_name} já está instanciado')
                                 if app.app_name == key:
                                     app.app_update(remote_version=value['version'])
-                        
+
+        '''
+        quando a maquina já estiver executando o código a algum tempo 
+        ele vai verificar se a quantidade de apps remotos é maior que o numero de app rodando na maquina local
+        '''
+        for key, value in json_remote.items():
+            if 'maquinas' in value:
+                if hostname in value['maquinas'] or 'all' in value['maquinas']:
+                    if key != "config":
+                        app_quot_remote += 1
+        logger.info(f'existem {app_quot_remote} apps remotos')
+        if app_quot < app_quot_remote:
+            logger.warning('HÁ NOVOS APPS DISPONIVEIS')
     else:
         logger.critical(f'LOOP ERROR Falha ao fazer o download. Status code: {response.status_code}')
 
