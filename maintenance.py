@@ -133,37 +133,20 @@ def initialize():
         #esse "app_managers" é uma lista que contêm todos os apps em execução no momento
         for key, value in json_remote.items():
             if 'maquinas' in value:
-                if hostname in value['maquinas'] or 'all' in value['maquinas']:     
-                    if len(app_managers) == 0:
+                if hostname in value['maquinas'] or 'all' in value['maquinas']:
+                    app_instanciado = False
+                    for app in app_managers:
+                        logger.info(f'{app.app_name} já está instanciado')
+                        if app.app_name == key:
+                            app_instanciado = True
+                            app.app_update(remote_version=value['version'])     
+                    if app_instanciado == False:
                         logger.info(f'{key}: instanciando')
                         app_manager = App_manager(app_name=key, version=value['version'], url_download=value["url"], executable_name=value["executable_name"])
                         app_manager.app_download()
                         app_manager.app_start()
                         app_managers.append(app_manager)
                         app_quot += 1
-                            
-                    elif len(app_managers) > 0:
-                        #aqui ele vai intera por cada APP instanciado, e dar o update em cada um deles
-                        for app in app_managers:
-                                logger.info(f'{app.app_name} já está instanciado')
-                                if app.app_name == key:
-                                    app.app_update(remote_version=value['version'])
-
-        '''
-        quando a maquina já estiver executando o código a algum tempo 
-        ele vai verificar se a quantidade de apps remotos é maior que o numero de app rodando na maquina local
-        '''
-        for key, value in json_remote.items():
-            if 'maquinas' in value:
-                if hostname in value['maquinas'] or 'all' in value['maquinas']:
-                    if key != "config":
-                        app_quot_remote += 1
-        logger.info(f'existem {app_quot_remote} apps remotos')
-        if app_quot < app_quot_remote:
-            logger.warning('HÁ NOVOS APPS DISPONIVEIS')
-    else:
-        logger.critical(f'LOOP ERROR Falha ao fazer o download. Status code: {response.status_code}')
-
 
 def initialize_loop():
 
