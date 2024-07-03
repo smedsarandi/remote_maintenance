@@ -11,7 +11,7 @@
         "executable_name":"teste1.exe"
     },
     "loadbalancer":{
-        "maquinas": ["DESKTOP-TRB81N6"],
+        "maquinas": ["SMED-40560"],
         "app_name":"teste2",
         "version":13,
         "url":"https://github.com/smedsarandi/remote_maintenance/raw/main/apps/teste1/dist/teste1.zip",
