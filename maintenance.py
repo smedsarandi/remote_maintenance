@@ -127,7 +127,11 @@ def initialize():
     print(f'ao chamar initialize o app_managers é: {len(app_managers)}')
     global app_quot
     app_quot_remote = 0
-    response = requests.get('https://github.com/smedsarandi/remote_maintenance/raw/main/remote_maintenance.json')
+     headers = {
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache'
+    }
+    response = requests.get('https://github.com/smedsarandi/remote_maintenance/raw/main/remote_maintenance.json', headers=headers)
     if response.status_code == 200: 
         json_remote = response.json()  # Decodifica o conteúdo JSON da resposta
         #esse "app_managers" é uma lista que contêm todos os apps em execução no momento
