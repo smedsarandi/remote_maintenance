@@ -3,23 +3,17 @@ import os
 import zipfile
 import time
 import socket
-import json
 import shutil
 import subprocess
-import threading
 import logging
-
 # Importações de bibliotecas de terceiros
 import requests
 import psutil
-
 # Variaveis globais
 hostname = socket.gethostname()
 app_managers = [] #É uma lista que contêm todos os apps em execução no momento
-app_quot = 0 #Vai armazenar a quantidade de app que existe quando o app_managers for criado, pois se for criados novos apps para essa maquina, ele reconhecerá
+
 directory_executor = 'c:/apps/'
-
-
 if not os.path.exists(directory_executor):# Verificação a existência do diretório de execução, caso contrário ele será criado
     os.makedirs(directory_executor)
 os.chdir(directory_executor) # definindo o diretório de execução
@@ -116,8 +110,6 @@ class App_manager:
 #Ela é responsavel por verificar no json remoto se será preciso iniciar algum app;
 #Se APPS ja estão inicializados ela vetificará a versão atual para possiveis update.
 def initialize():
-    global app_quot
-    app_quot_remote = 0
     headers = {
         'Cache-Control': 'no-cache',
         'Pragma': 'no-cache'
@@ -134,15 +126,15 @@ def initialize():
                         if app.app_name == key:                            
                             app_instanciado = True
                             logger.info(f'{app.app_name}: já está instanciado') #identificou que o APP ja esta instanciado na maquina, entao ele vai buscar por atts
-                            app.app_update(remote_version=value['version'])   
+                            app.app_update(remote_version=value['version'])
                     
-                    if app_instanciado == False: #agora se o APPS nao estiver instanciado, entao esta parte vai instancialo
+                    if app_instanciado == False: #agora se o APPS nao estiver instanciado, entao esta parte vai instancia-lo
                         logger.info(f'{key}: instanciando')
                         app_manager = App_manager(app_name=key, version=value['version'], url_download=value["url"], executable_name=value["executable_name"])
                         app_manager.app_download()
                         app_manager.app_start()
                         app_managers.append(app_manager)
-                        app_quot += 1
+
     else:
         logger.error('Não foi possivel baixar json com novas informações')
 
@@ -154,10 +146,5 @@ def initialize_loop():
         logger.info(f'##########o tamano do app_managers atualmente é:{len(app_managers)}')
         logger.warning("INICIALIZANDO LOOP")
         initialize()
-        time.sleep(10)
-
-
+        time.sleep(10) 
 initialize_loop()
-#initialize_thread = threading.Thread(target=initialize_loop)
-#initialize_thread.start()
-
