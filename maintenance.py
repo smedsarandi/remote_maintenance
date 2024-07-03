@@ -138,6 +138,7 @@ def initialize():
                         app_manager.app_download()
                         app_manager.app_start()
                         app_managers.append(app_manager)
+                        global app_quot
                         app_quot = app_quot + 1
         else:
             logger.warning(f"{len(app_managers)} apps em execução")
