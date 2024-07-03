@@ -127,7 +127,7 @@ def initialize():
     print(f'ao chamar initialize o app_managers é: {len(app_managers)}')
     global app_quot
     app_quot_remote = 0
-     headers = {
+    headers = {
         'Cache-Control': 'no-cache',
         'Pragma': 'no-cache'
     }
@@ -151,7 +151,10 @@ def initialize():
                         app_manager.app_start()
                         app_managers.append(app_manager)
                         app_quot += 1
+    else:
+        logger.error('Não foi possivel baixar json com novas informações')
 
+        
 def initialize_loop():
 
     while True:

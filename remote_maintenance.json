@@ -6,28 +6,28 @@
     "teste1":{
         "maquinas": ["all"],
         "app_name":"teste1",
-        "version":14,
+        "version":1,
         "url":"https://github.com/smedsarandi/remote_maintenance/raw/main/apps/teste1/dist/teste1.zip",
         "executable_name":"teste1.exe"
     },
-    "loadbalancer":{
+    "teste-2":{
         "maquinas": ["SMED-40560","DESKTOP-TRB81N6"],
-        "app_name":"teste2",
-        "version":13,
-        "url":"https://github.com/smedsarandi/remote_maintenance/raw/main/apps/teste1/dist/teste1.zip",
-        "executable_name":"teste1.exe"
+        "app_name":"teste-2",
+        "version":1,
+        "url":"https://github.com/smedsarandi/remote_maintenance/raw/main/apps/teste-2/dist/teste-2.zip",
+        "executable_name":"teste-2.exe"
     },
     "loadbalancer3":{
         "maquinas": ["SMED-40560T"],
         "app_name":"teste3",
-        "version":14,
+        "version":1,
         "url":"https://github.com/smedsarandi/remote_maintenance/raw/main/apps/teste1/dist/teste1.zip",
         "executable_name":"teste1.exe"
     },
     "loadbalancer4":{
         "maquinas": ["SMED-40560"],
         "app_name":"teste4",
-        "version":14,
+        "version":1,
         "url":"https://github.com/smedsarandi/remote_maintenance/raw/main/apps/teste1/dist/teste1.zip",
         "executable_name":"teste1.exe"
     }
