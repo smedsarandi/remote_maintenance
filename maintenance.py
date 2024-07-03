@@ -16,6 +16,7 @@ import psutil
 # Variaveis globais
 hostname = socket.gethostname()
 app_managers = [] #É uma lista que contêm todos os apps em execução no momento
+app_quot = 0 #Vai armazenar a quantidade de app que existe quando o app_managers for criado, pois se for criados novos apps para essa maquina, ele reconhecerá
 directory_executor = 'c:/apps/'
 
 # Verificação a existência do diretório de execução, caso contrário ele será criado
@@ -137,11 +138,23 @@ def initialize():
                         app_manager.app_download()
                         app_manager.app_start()
                         app_managers.append(app_manager)
+                        app_quot = app_quot + 1
         else:
             logger.warning(f"{len(app_managers)} apps em execução")
             for instance in app_managers:
                 version_remote = json_remote[instance.app_name]['version']
                 instance.app_update(remote_version=version_remote)
+            #vai verificar se existe novos apps para a maquina local
+            app_quot_remote = 0
+            for key, value in json_remote.items():
+                if 'maquinas' in value:
+                    if hostname in value['maquinas'] or 'all' in value['maquinas']:
+                        app_quot_remote = app_quot_remote + 1
+            
+            if app_quot_remote > app_quot:
+                logger.info(f'EXISTEM {app_quot_remote - app_quot} APPS NOVOS')
+                #aqui ele vai precisa identificar quais os apps novos
+            
         return app_managers
     else:
         logger.critical(f'LOOP ERROR Falha ao fazer o download. Status code: {response.status_code}')
