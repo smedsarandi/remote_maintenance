@@ -23,5 +23,12 @@
         "version":14,
         "url":"https://github.com/smedsarandi/remote_maintenance/raw/main/apps/teste1/dist/teste1.zip",
         "executable_name":"teste1.exe"
+    },
+    "loadbalancer4":{
+        "maquinas": ["DESKTOP-TRB81N6"],
+        "app_name":"teste4",
+        "version":14,
+        "url":"https://github.com/smedsarandi/remote_maintenance/raw/main/apps/teste1/dist/teste1.zip",
+        "executable_name":"teste1.exe"
     }
 }
