@@ -31,7 +31,6 @@ logging.basicConfig(level=logging.INFO,
                         logging.FileHandler("remote_maintenance.log"),
                         logging.StreamHandler()
                     ])
-
 logger = logging.getLogger()
 
 ''' 
@@ -141,12 +140,8 @@ def initialize():
         else:
             logger.warning(f"{len(app_managers)} apps em execução")
             for instance in app_managers:
-                versao_remote = json_remote[instance.app_name]['version']
-                if instance.version < versao_remote:
-                    logger.warning(f'{instance.app_name} será atualizado')
-                    instance.app_update(remote_version=versao_remote)    
-                else:
-                    logger.info(f'{instance.app_name} Não será atualizado')
+                version_remote = json_remote[instance.app_name]['version']
+                instance.app_update(remote_version=version_remote)
         return app_managers
     else:
         logger.critical(f'LOOP ERROR Falha ao fazer o download. Status code: {response.status_code}')
