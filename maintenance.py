@@ -17,6 +17,7 @@ import psutil
 hostname = socket.gethostname()
 app_managers = [] #É uma lista que contêm todos os apps em execução no momento
 app_quot = 0 #Vai armazenar a quantidade de app que existe quando o app_managers for criado, pois se for criados novos apps para essa maquina, ele reconhecerá
+app_quot_remote = 0
 directory_executor = 'c:/apps/'
 
 # Verificação a existência do diretório de execução, caso contrário ele será criado
@@ -124,6 +125,8 @@ Ela é responsavel por verificar no json remoto se será preciso iniciar algum a
 Se APPS ja estão inicializados ela vetificará a versão atual para possiveis update.
 '''
 def initialize():
+    global app_quot
+    global app_quot_remote
     response = requests.get('https://github.com/smedsarandi/remote_maintenance/raw/main/remote_maintenance.json')
     if response.status_code == 200: 
         json_remote = response.json()  # Decodifica o conteúdo JSON da resposta
@@ -138,20 +141,21 @@ def initialize():
                         app_manager.app_download()
                         app_manager.app_start()
                         app_managers.append(app_manager)
-                        global app_quot
-                        app_quot = app_quot + 1
+                        app_quot += 1
         else:
             logger.warning(f"{len(app_managers)} apps em execução")
             for instance in app_managers:
                 version_remote = json_remote[instance.app_name]['version']
                 instance.app_update(remote_version=version_remote)
+            
             #vai verificar se existe novos apps para a maquina local
             app_quot_remote = 0
             for key, value in json_remote.items():
                 if 'maquinas' in value:
                     if hostname in value['maquinas'] or 'all' in value['maquinas']:
-                        app_quot_remote = app_quot_remote + 1
-            
+                        app_quot_remote += 1
+                        logger.info(f'{app_quot_remote} apps remotos: {key}')
+            logger.info(f'{app_quot} apps local')
             if app_quot_remote > app_quot:
                 logger.info(f'EXISTEM {app_quot_remote - app_quot} APPS NOVOS')
                 #aqui ele vai precisa identificar quais os apps novos
@@ -163,6 +167,8 @@ def initialize():
 
 def initialize_loop():
     while True:
+        global app_managers
+        logger.info('\n\n')
         logger.warning("INICIALIZANDO LOOP")
         app_managers = initialize()
         time.sleep(5)
