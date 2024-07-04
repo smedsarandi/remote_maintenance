@@ -24,8 +24,9 @@ python -m venv .venv
 > comando para entrar no ambiente virtual:
 .venv\Scripts\activate
 
-> comando para buildar o arquivo .py ou .pyw:
-pyinstaller maintenance.py --onefile --icon img/icon.ico
+> comando para buildar o arquivos .py ou .pyw:
+pyinstaller maintenance.py --onefile --icon apps/img/brasao.ico
+pyinstaller install.py --onefile --icon apps/img/install.ico
 
 
 ## git configs

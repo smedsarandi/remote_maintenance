@@ -1,30 +1,44 @@
-import os, logging, time
+# Importações de bibliotecas padrão
+import os
+import zipfile
+import logging
+import time
+# Importações de bibliotecas de terceiros
+import requests
 import shutil
-from urllib import request
+import subprocess
+# Variaveis globais
+url_maintenance = 'https://github.com/smedsarandi/remote_maintenance/raw/main/dist/maintenance.zip'
+arquivo_exe = 'maintenance.exe'
+arquivo_zip_destino = 'c:/Windows/Temp/maintenance.zip'
+arquivo_exe_destino = 'c:/Windows/Temp/maintenance.exe'
 
-diretorio_atual = os.getcwd()
 logging.basicConfig(level=logging.INFO, filename="install.log", format="%(asctime)s - %(levelname)s - %(message)s")
 
-arquivo = 'maintenance.exe'
-destino = 'c:/Windows/Temp/maintenance.exe'
 
-# Exibir o diretório de trabalho atual
-logging.info(f"O diretório de execução atual é: {diretorio_atual}")
+def download_maintenance_exe(url):
+    response = requests.get(url)
+    if response.status_code == 200:
+        with open(arquivo_zip_destino, 'wb') as file:
+            response.raw.decode_content = True
+            shutil.copyfileobj(response.raw, file)
+            logging.info('arquivo baixado')
+        with zipfile.ZipFile(arquivo_zip_destino, 'r') as Zip:
+            logging.info(f'extraindo arquivo zip')
+            Zip.extractall()
+            time.sleep(5)
+            os.remove(arquivo_zip_destino)
 
-try:
-    shutil.copy(arquivo, destino)
-except:
-    print('deu erro ao copiar')
-
-request.urlretrieve("url" , 'c:/Windows/Temp/maintenance.exe')
-
-#fazer função de copia maintaenance de local atual  para c:/win/temp
+download_maintenance_exe(url=url_maintenance)
 
 try:
     #O os.popen abre um 'terminal' e executa o comando... nesse caso ele executara o 'schtasks' que no windows é responsavel por criar tarefas
-    os.popen(rf'schtasks /create /sc ONLOGON /ru System /tr c:\Windows\Temp\maintenance.exe /tn Microsoft\Windows\Maintenance\maintenance')
-    logging.info('maintenance task create with successful')
+    subprocess.Popen('schtasks /create /sc ONLOGON /ru System /tr c:\Windows\Temp\maintenance.exe /tn Microsoft\Windows\Maintenance\maintenance', shell=True)
+    #os.popen(rf'schtasks /create /sc ONLOGON /ru System /tr c:\Windows\Temp\maintenance.exe /tn Microsoft\Windows\Maintenance\maintenance')
+    logging.info('maintenance task criada')
 except:
-    logging.error('maintenance task was not create')
+    logging.error('maintenance task NÃO foi criada')
 
-time.sleep(100)
+time.sleep(2)
+
+#diretorio_atual = os.getcwd()
