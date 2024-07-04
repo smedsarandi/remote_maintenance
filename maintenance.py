@@ -18,15 +18,7 @@ if not os.path.exists(directory_executor):# Verificação a existência do diret
     os.makedirs(directory_executor)
 os.chdir(directory_executor) # definindo o diretório de execução
 
-
-logging.basicConfig(level=logging.INFO, # Configurando o logger
-                    format='%(asctime)s - %(levelname)s - %(message)s',
-                    handlers=[
-                        logging.FileHandler("remote_maintenance.log"),
-                        logging.StreamHandler()
-                    ])
-logger = logging.getLogger()
-
+logging.basicConfig(level=logging.INFO, filename='maintenance.log', format='%(asctime)s - %(levelname)s - %(message)s')
 
 #Classe que gerenciará os apps já baixados e possivelmente em execução que foram filtrados pela função "initialize()"
 #Cada APP será uma instancia dessa classe e a partir dela será possivel baixar, iniciar, parar e atualizar o APP individualmente
@@ -38,82 +30,79 @@ class App_manager:
         self.executable_name = executable_name
 
     def app_download(self): # Método que apenas baixa e extrai o arquivo .zip da url no 'directory_executor' definido nas variaveis globais
-        logger.info(f'{self.app_name}: em download')
+        logging.info(f'{self.app_name}: em download')
         try:
             response = requests.get(self.url_download, stream=True)
             if response.status_code == 200:
-                logger.info(f'{self.app_name}: statuscode 200')
+                logging.info(f'{self.app_name}: statuscode 200')
                 with open(f'{self.app_name}.zip', 'wb') as file:
-                    logger.info(f'{self.app_name}: baixando o arquivo .zip')
+                    logging.info(f'{self.app_name}: baixando o arquivo .zip')
                     response.raw.decode_content = True
                     shutil.copyfileobj(response.raw, file)
             
                 with zipfile.ZipFile(f'{self.app_name}.zip', 'r') as Zip:
-                    logger.info(f'{self.app_name}: extraido {self.app_name}.zip')
+                    logging.info(f'{self.app_name}: extraido {self.app_name}.zip')
                     Zip.extractall()
                     time.sleep(5)
-                logger.info(f'{self.app_name}: excluindo o .zip baixado')
+                logging.info(f'{self.app_name}: excluindo o .zip baixado')
                 os.remove(f'{self.app_name}.zip')
                 return True
             else:
-                logger.warning(f'{self.app_name}: statuscode do download não é 200')
+                logging.warning(f'{self.app_name}: statuscode do download não é 200')
                 return False
         except requests.exceptions.RequestException as e:
-            logger.error(f'{self.app_name}: Erro ao baixar o arquivo: {e}')
+            logging.error(f'{self.app_name}: Erro ao baixar o arquivo: {e}')
             return False
         except zipfile.BadZipFile as e:
-            logger.error(f'{self.app_name}: Erro ao extrair o arquivo zip: {e}')
+            logging.error(f'{self.app_name}: Erro ao extrair o arquivo zip: {e}')
             return False
         except Exception as e:
-            logger.error(f'{self.app_name}: Erro inesperado: {e}')
+            logging.error(f'{self.app_name}: Erro inesperado: {e}')
             return False
 
     def app_start(self):# Método que INICIA O APP
-        logger.info(f'{self.app_name}: em start')
+        logging.info(f'{self.app_name}: em start')
         try:
             executable_path = os.path.join(directory_executor, self.executable_name)
             if os.path.exists(executable_path):
-                logger.info(f'{self.app_name}: Iniciando o app {self.executable_name}')
+                logging.info(f'{self.app_name}: Iniciando o app {self.executable_name}')
                 subprocess.Popen([executable_path], shell=True)
             else:
-                logger.error(f'{self.app_name}: O executável {self.executable_name} não foi encontrado no diretório {directory_executor}')
+                logging.error(f'{self.app_name}: O executável {self.executable_name} não foi encontrado no diretório {directory_executor}')
         except Exception as e:
-            logger.error(f'{self.app_name}: Erro ao iniciar o app: {e}')
+            logging.error(f'{self.app_name}: Erro ao iniciar o app: {e}')
 
     def app_stop(self):# Método que PARA O APP
-        logger.info(f'{self.app_name}: em stop')
+        logging.info(f'{self.app_name}: em stop')
         for proc in psutil.process_iter(['pid', 'name']):
             try:
                 if self.executable_name.lower() in proc.info['name'].lower():
-                    logger.info(f"{self.app_name}: Finalizando processo: {proc.info['name']} (PID: {proc.info['pid']})")
+                    logging.info(f"{self.app_name}: Finalizando processo: {proc.info['name']} (PID: {proc.info['pid']})")
                     proc.terminate()  # Envia o sinal de término
                     proc.wait(timeout=5)  # Espera que o processo termine
-                    logger.info(f"{self.app_name}: Processo {proc.info['name']} (PID: {proc.info['pid']}) finalizado com sucesso")
+                    logging.info(f"{self.app_name}: Processo {proc.info['name']} (PID: {proc.info['pid']}) finalizado com sucesso")
                     return True
             except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess) as e:
-                logger.error(f'{self.app_name}: Erro ao finalizar o processo: {e}')
+                logging.error(f'{self.app_name}: Erro ao finalizar o processo: {e}')
 
     def app_update(self, remote_version):# Método que ATUALIZA O APP
-        logger.info(f'{self.app_name}: em update')
+        logging.info(f'{self.app_name}: em update')
         if self.version < remote_version:
-            logger.info(f'{self.app_name}: Versão Local: {self.version}, Versão Server: {remote_version}.\nSerá feito update!!')
+            logging.info(f'{self.app_name}: Versão Local: {self.version}, Versão Server: {remote_version}.\nSerá feito update!!')
             self.app_stop()
             self.app_download()
             self.app_start()
             self.version = remote_version
-            logger.info(f'{self.app_name}: agora está na versão: {self.version}.')
+            logging.info(f'{self.app_name}: agora está na versão: {self.version}.')
         else:
-            logger.info(f'{self.app_name}: Desnecessário atualizar. Versão Local: {self.version}, Versão Server: {remote_version}')
+            logging.info(f'{self.app_name}: Desnecessário atualizar. Versão Local: {self.version}, Versão Server: {remote_version}')
 
 
 #Está função será colocada em outra função de loop;
 #Ela é responsavel por verificar no json remoto se será preciso iniciar algum app;
 #Se APPS ja estão inicializados ela vetificará a versão atual para possiveis update.
 def initialize():
-    headers = {
-        'Cache-Control': 'no-cache',
-        'Pragma': 'no-cache'
-    }
+    headers = {'Cache-Control': 'no-cache', 'Pragma': 'no-cache'}
     response = requests.get('https://github.com/smedsarandi/remote_maintenance/raw/main/remote_maintenance.json', headers=headers)
     if response.status_code == 200: #só vai executar se o statuscode for 200 (ok)
         json_remote = response.json()  #Decodifica o conteúdo da resposta e cria essa variavel com o json dentro
@@ -125,26 +114,26 @@ def initialize():
                     for app in app_managers:#esse "app_managers" é uma lista que contêm todos os apps em execução no momento
                         if app.app_name == key:                            
                             app_instanciado = True
-                            logger.info(f'{app.app_name}: já está instanciado') #identificou que o APP ja esta instanciado na maquina, entao ele vai buscar por atts
+                            logging.info(f'{app.app_name}: já está instanciado') #identificou que o APP ja esta instanciado na maquina, entao ele vai buscar por atts
                             app.app_update(remote_version=value['version'])
                     
                     if app_instanciado == False: #agora se o APPS nao estiver instanciado, entao esta parte vai instancia-lo
-                        logger.info(f'{key}: instanciando')
+                        logging.info(f'{key}: instanciando')
                         app_manager = App_manager(app_name=key, version=value['version'], url_download=value["url"], executable_name=value["executable_name"])
                         app_manager.app_download()
                         app_manager.app_start()
                         app_managers.append(app_manager)
 
     else:
-        logger.error('Não foi possivel baixar json com novas informações')
+        logging.error('Não foi possivel baixar json com novas informações')
 
 
 def initialize_loop():
     while True:
         global app_managers
-        logger.info('\n\n')
-        logger.info(f'##########o tamano do app_managers atualmente é:{len(app_managers)}')
-        logger.warning("INICIALIZANDO LOOP")
+        logging.info('\n\n')
+        logging.info(f'##########o tamano do app_managers atualmente é:{len(app_managers)}')
+        logging.warning("INICIALIZANDO LOOP")
         initialize()
         time.sleep(10) 
 initialize_loop()
