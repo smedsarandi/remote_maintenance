@@ -6,7 +6,7 @@
     "teste1":{
         "maquinas": ["all"],
         "app_name":"teste1",
-        "version":1,
+        "version":2,
         "url":"https://github.com/smedsarandi/remote_maintenance/raw/main/apps/teste1/dist/teste1.zip",
         "executable_name":"teste1.exe"
     },
