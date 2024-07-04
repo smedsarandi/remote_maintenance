@@ -132,7 +132,7 @@ def initialize_loop():
     while True:
         global app_managers
         logging.info('\n\n')
-        logging.info(f'##########o tamano do app_managers atualmente é:{len(app_managers)}')
+        logging.info(f'##########o tamanho do app_managers atualmente é:{len(app_managers)}')
         logging.warning("INICIALIZANDO LOOP")
         initialize()
         time.sleep(10) 
