@@ -88,7 +88,7 @@ class App_manager:
     def app_update(self, remote_version):# Método que ATUALIZA O APP
         logging.info(f'{self.app_name}: em update')
         if self.version < remote_version:
-            logging.info(f'{self.app_name}: Versão Local: {self.version}, Versão Server: {remote_version}.\nSerá feito update!!')
+            logging.info(f'{self.app_name}: Versão Local: {self.version}, Versão Server: {remote_version}. Será feito update!!')
             self.app_stop()
             self.app_download()
             self.app_start()
