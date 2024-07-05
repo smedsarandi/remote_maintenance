@@ -6,6 +6,7 @@ import socket
 import shutil
 import subprocess
 import logging
+import glob
 # Importações de bibliotecas de terceiros
 import requests
 import psutil
@@ -31,14 +32,12 @@ class App_manager:
 
     def app_download(self): # Método que apenas baixa e extrai o arquivo .zip da url no 'directory_executor' definido nas variaveis globais
         logging.info(f'{self.app_name}: em download')
-        logger.info(f'{self.app_name}: em download')
         arrayNomeArquivos = glob.glob('*.exe')
         for nomeArquivo in arrayNomeArquivos:
             if not "-" in nomeArquivo or not "-" in self.executable_name:
                 break
-            nomeArquivo = nomeArquivo.replace('.exe','')
-            if nomeArquivo.split("-")[0] == self.executable_name.replace('.exe','').split("-")[0]:
-                if nomeArquivo.split("-")[1] == self.executable_name.replace('.exe','').split("-")[1]:
+            if nomeArquivo.lower().split("-")[0] == self.executable_name.lower().split("-")[0]:
+                if nomeArquivo.lower().split("-")[1] == self.executable_name.lower().split("-")[1]:
                     logger.info(f'{self.app_name}: já foi baixado')
                     return True
                 else:
